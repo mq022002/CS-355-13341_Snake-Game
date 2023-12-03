@@ -3,9 +3,9 @@
 
 #include <curses.h>
 #include <locale.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -169,10 +169,10 @@ int main(int arc, char **argv)
         // [S.C] Condition to end game if hitting boarder
         if (head[0] == 0 || head[0] >= gWidth || head[1] == 0 || head[1] >= gHeight)
             gameOver();
-        
+
         // [A.C.] Condition to end game if win condition is met
-        if (sLength == (gWidth*2+gHeight*2)/2)
-            victory();            
+        if (sLength >= (gWidth * 2 + gHeight * 2) / 2)
+            victory();
 
         /**** DRAW / REFRESH SCREEN ****/
 
@@ -192,8 +192,9 @@ int main(int arc, char **argv)
 
 // The Snake Pit
 // [N.T.]   [001] The snake pit is the area where the snake can move.
-// [N.T.]   [002] The snake pit must utilize all available space of the current terminal window.
-// [N.T.]   [003] The snake pit must have a visible border delineating the snake pit.
+// [N.T.]   [002] The snake pit must utilize all available space of the current
+// terminal window. [N.T.]   [003] The snake pit must have a visible border
+// delineating the snake pit.
 // ========================================
 
 // [001]
@@ -226,13 +227,14 @@ void makeBorder(int width, int height, char *borderSymbol)
             }
         }
     }
-}
+} // makeBorder
 
 // The Snake
 // [S.C.]   [004] The inital length of the snake is 5 characters.
 // [S.C.]   [005] Initial direction of the snake's movement is chosen randomly.
-// [A.C.]   [006] The user can press either one of the four arrow keys or WASD to change the direction of the snake's movement.
-// [M.Q.]   [007] The snake's speed is proportional to its length.
+// [A.C.]   [006] The user can press either one of the four arrow keys or WASD
+// to change the direction of the snake's movement. [M.Q.]   [007] The snake's
+// speed is proportional to its length.
 // ========================================
 
 // [004]
@@ -243,7 +245,7 @@ void initializeSnakeLength(int (*bod)[2], int sLength, int xDir, int yDir)
         bod[i][0] = (gWidth / 2) - i * xDir;
         bod[i][1] = (gHeight / 2) - i * yDir;
     }
-}
+} // initializeSnakeLength
 
 // [005]
 void initializeSnakeDirection(int *xDir, int *yDir)
@@ -274,7 +276,7 @@ void initializeSnakeDirection(int *xDir, int *yDir)
     default:
         break;
     }
-}
+} // initializeSnakeDirection
 
 // [006]
 void changeDirection(int input, int *xDir, int *yDir)
@@ -316,26 +318,25 @@ void changeDirection(int input, int *xDir, int *yDir)
     default:
         break;
     }
-}
+} // changeDirection
 
 // [007]
-int makeSnakeZoomZoom(int snakeLength)
-{
-    return 200000 - snakeLength * 5000;
-}
+int makeSnakeZoomZoom(int snakeLength) { return 200000 - snakeLength * 5000; }
 
 // The Trophies
-// [M.Q.]   [008] Trophies are represented by a digit randomly chosen from 1 to 9.
-// [M.Q.]   [009] There's always exactly one trophy in the snakepit at any given moment.
-// [N.T.]   [010] When the snake eats the trophy, its length is increased by the corresponding number of characters.
-// [M.Q.]   [011] A trophy expires after a random interval from 1 to 9 seconds
-// [M.Q.]   [012] A new trophy is shown at a random location on the screen after the previous one has either expired or is eated by the snake.
+// [M.Q.]   [008] Trophies are represented by a digit randomly chosen from 1
+// to 9. [M.Q.]   [009] There's always exactly one trophy in the snakepit at any
+// given moment. [N.T.]   [010] When the snake eats the trophy, its length is
+// increased by the corresponding number of characters. [M.Q.]   [011] A trophy
+// expires after a random interval from 1 to 9 seconds [M.Q.]   [012] A new
+// trophy is shown at a random location on the screen after the previous one has
+// either expired or is eated by the snake.
 // ========================================
 
 int getRandomNumber(int min, int max)
 {
     return rand() % (max - min + 1) + min;
-}
+} // getRandomNumber
 
 void handleTrophy(int *head, int (*bod)[2], int *sLength)
 {
@@ -343,9 +344,6 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength)
     static int trophyValue = 0;
     static time_t trophyExpirationTime = 0;
 
-    static int distanceFromHead = 0;
-
-    // [009]
     if (head[0] == trophyPosition[0] && head[1] == trophyPosition[1])
     {
         // [010]
@@ -354,27 +352,37 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength)
         trophyPosition[1] = -1;
         trophyExpirationTime = 0;
     }
+    // [009]
     else if (time(NULL) >= trophyExpirationTime)
     {
         // [012]
-        trophyPosition[0] = getRandomNumber(1, LINES - 2);
-        trophyPosition[1] = getRandomNumber(1, COLS - 2);
+        // What if the trophy is too far from the snake regarding the snake’s speed?
+        // What about the random locations on the border of your screen?
+        do
+        {
+            trophyPosition[0] = getRandomNumber(1, gWidth - 2);
+            trophyPosition[1] = getRandomNumber(1, gHeight - 2);
+        } while (abs(head[0] - trophyPosition[0]) +
+                     abs(head[1] - trophyPosition[1]) >
+                 *sLength);
+
         // [008]
         trophyValue = getRandomNumber(1, 9);
         // [011]
         trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
 
-    // Draw the trophy on the screen
+    // How did you manage displaying and changing the location of trophy?
     mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
-}
+} // handleTrophy
 
 // The Gameplay
 // [S.C.]   [013] The snake dies and the game ends if:
 //              It runs into the border; or
 //              It runs into itself; or
 //              The user attempts to reverse the snake's direction.
-// [A.C.]   [014] The user wins the game if the snake's length grows to the length equal to half the perimeter of the border.
+// [A.C.]   [014] The user wins the game if the snake's length grows to the
+// length equal to half the perimeter of the border.
 // ========================================
 
 // [013]
@@ -391,8 +399,9 @@ void gameOver()
     }
     sleep(5);
     alive = false;
-}
-//[014]
+} // gameOver
+
+// [014]
 void victory()
 {
     clear();
@@ -406,7 +415,7 @@ void victory()
     }
     sleep(5);
     alive = false;
-}
+} // victory
 
 // Misc Stuff
 // ========================================
