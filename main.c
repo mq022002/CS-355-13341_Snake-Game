@@ -321,7 +321,13 @@ void changeDirection(int input, int *xDir, int *yDir)
 } // changeDirection
 
 // [007]
-int makeSnakeZoomZoom(int snakeLength) { return 200000 - snakeLength * 5000; }
+int baseSleepTime = 300000;
+int lengthMultiplier = 2000;
+
+int makeSnakeZoomZoom(int snakeLength) {
+    return baseSleepTime - snakeLength * lengthMultiplier;
+}
+
 
 // The Trophies
 // [M.Q.]   [008] Trophies are represented by a digit randomly chosen from 1
