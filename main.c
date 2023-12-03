@@ -5,11 +5,12 @@
 #include <curses.h>
 #include <time.h>
 
+// [N.T.] Function for making the border of the snake pit
 void MakeBorder(int width, int height, char* borderSymbol);
 
 int main(int arc, char** argv)
 {
-    // Set charset to allow for unicode characters
+    // [N.T.] Set charset to allow for unicode characters
     // Used for block character in screen border
     setlocale(LC_ALL, "");
 
@@ -33,11 +34,11 @@ int main(int arc, char** argv)
     // Ignores cursor as input
     curs_set(0);
 
-    // For using arrow keys
+    // [S.C.] For using arrow keys
     keypad(stdscr, TRUE);                   
     nodelay(stdscr,TRUE);
-
-    // Initial snake setup
+    
+    // [S.C] Initial snake setup
     int head[2] = {LINES/2, COLS/2};
     int bod[500][2] = {0};
     int tl[2];
@@ -53,7 +54,7 @@ int main(int arc, char** argv)
     // Sets initial length    
     int sLength = 5;
 
-    // For the initial direction of the snake
+    // [S.C.] For the initial direction of the snake
     int initDir = rand() % 4 + 1;           
     switch(initDir) {
     // Face right
@@ -80,7 +81,7 @@ int main(int arc, char** argv)
         break;
     }
 
-    // Build the snake based on the random starting direction
+    // [S.C.] Build the snake based on the random starting direction
     for (int i = 0; i < 5; i++)
     {
         bod[i][0] = (LINES / 2) - i * yDir;
@@ -92,22 +93,24 @@ int main(int arc, char** argv)
     // Main loop
     while(alive)
     {
+        // [A.C.] Waits for user input, helps move snake accordingly
+        int input = getch();
+
         // Clear screen
         clear();
 
-        // Draw the border from the width, height, and symbol passed to the function
+        // [N.T.] Draw the border from the width, height, and symbol passed to the function
         MakeBorder(width, height, "\u2588");
 
-        // Waits for user input, helps move snake accordingly
-        int input = getch();
-        mvprintw(tl[0], tl[1], " ");
+        // [S.C.] Print snake parts
+        mvprintw(tl[0], tl[1], "X");
         mvprintw(bod[1][0], bod[1][1], "$");
         mvprintw(bod[2][0], bod[2][1], "$");
         mvprintw(bod[3][0], bod[3][1], "$");
         mvprintw(bod[4][0], bod[4][1], "$");
         mvprintw(head[0], head[1], "S");
 
-        //[A.C.] checks keypress to change direction, will add reverse check when ready
+        // [A.C.] checks keypress to change direction, will add reverse check when ready
         switch(input){
             case KEY_UP:
                 xDir = -1;
@@ -128,17 +131,20 @@ int main(int arc, char** argv)
                 break;
         }
 
+        // [A.C.] Update head location
         head[0] += xDir;
         head[1] += yDir;
         tl[0] = bod[sLength-1][0];
-        tl[1] = bod[sLength-1][0];   
+        tl[1] = bod[sLength-1][0];
 
-        //add more later for other conditions
-        for(int i = sLength - 1; i > 0; i--){
+        // [A.C.] Add more later for other conditions
+        for(int i = sLength - 1; i > 0; i--)
+        {
             bod[i][0] = bod[i-1][0];
             bod[i][1] = bod[i-1][1];
         }  
 
+        // [A.C.] Update body position
         bod[0][0] = head[0];
         bod[0][1] = head[1];
 
@@ -157,6 +163,7 @@ int main(int arc, char** argv)
 
 void MakeBorder(int width, int height, char* borderSymbol)
 {
+    // [N.T.] Draw loop for border
     for (int row = 0; row <= width; row++)
     {
         // Draw left side of the box
@@ -183,7 +190,7 @@ void MakeBorder(int width, int height, char* borderSymbol)
     }
 }
 
-// NOTES:
+// GROUP NOTES:
 // COLORS EXAMPLE:
 
 /*
@@ -202,5 +209,6 @@ void MakeBorder(int width, int height, char* borderSymbol)
     addstr(b.borderSymbol);
     attroff(COLOR_PAIR((row % 2 == 0) ? 1 : 2));
 */
+
 
 
