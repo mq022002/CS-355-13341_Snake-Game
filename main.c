@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <wchar.h>
 #include <locale.h>
 #include <curses.h>
 #include <time.h>
@@ -29,7 +28,7 @@ int main(int arc, char** argv)
     srand((long)time(NULL));
 
     // Turn off console Echo
-    noecho();	
+    noecho();
 
     // Ignores cursor as input
     curs_set(0);
@@ -41,17 +40,18 @@ int main(int arc, char** argv)
     // Initial snake setup
     int head[2] = {LINES/2, COLS/2};
     int bod[500][2] = {0};
+    int tl[2];
+
     bod[0][0] = LINES / 2;
     bod[0][1] = COLS / 2;
-    int tl[2];
     int lines = LINES;
     int cols = COLS;
     // Determins up and down
-    int xDir;  
+    int xDir;
     // Determins left and right
     int yDir;
     // Sets initial length    
-    int sLength = 5; 
+    int sLength = 5;
 
     // For the initial direction of the snake
     int initDir = rand() % 4 + 1;           
@@ -60,65 +60,34 @@ int main(int arc, char** argv)
     case 1:
         xDir = 0;
         yDir = 1;
-        bod[1][0] = LINES / 2;
-        bod[2][0] = LINES / 2;
-        bod[3][0] = LINES / 2;
-        bod[4][0] = LINES / 2;
-        tl[0] = LINES / 2;
-        bod[1][1] = (COLS / 2) - 1;
-        bod[2][1] = (COLS / 2) - 2;
-        bod[3][1] = (COLS / 2) - 3;
-        bod[4][1] = (COLS / 2) - 4;
-        tl[1] = (COLS / 2) - 3;
         break;
     // Face left
     case 2:
         xDir = 0;
         yDir = -1;
-        bod[1][0] = LINES / 2;
-        bod[2][0] = LINES / 2;
-        bod[3][0] = LINES / 2;
-        bod[4][0] = LINES / 2;        
-        tl[0] = LINES / 2;
-        bod[1][1] = (COLS / 2) + 1;
-        bod[2][1] = (COLS / 2) + 2;
-        bod[3][1] = (COLS / 2) + 3;
-        bod[4][1] = (COLS / 2) + 4;
-        tl[1] = (COLS / 2) + 3;
         break;
     // Face up
     case 3:
         xDir = -1;
         yDir = 0;
-        bod[1][0] = LINES / 2 + 1;
-        bod[2][0] = LINES / 2 + 2;
-        bod[3][0] = LINES / 2 + 3;
-        bod[4][0] = LINES / 2 + 4;        
-        tl[0] = LINES / 2 + 3;
-        bod[1][1] = (COLS / 2);
-        bod[2][1] = (COLS / 2);
-        bod[3][1] = (COLS / 2);
-        bod[4][1] = (COLS / 2);
-        tl[1] = (COLS / 2);
         break;
     // Face down
     case 4:
         xDir = 1;
         yDir = 0;
-        bod[1][0] = LINES / 2 - 1;
-        bod[2][0] = LINES / 2 - 2;
-        bod[3][0] = LINES / 2 - 3;
-        bod[4][0] = LINES / 2 - 4;
-        tl[0] = LINES / 2 - 3;
-        bod[1][1] = (COLS / 2);
-        bod[2][1] = (COLS / 2);
-        bod[3][1] = (COLS / 2);
-        bod[4][1] = (COLS / 2);
-        tl[1] = (COLS / 2);
         break;
+    default:
+        break;
+    }
 
-    default:break;
-    }    
+    // Build the snake based on the random starting direction
+    for (int i = 0; i < 5; i++)
+    {
+        bod[i][0] = (LINES / 2) - i * yDir;
+        bod[i][1] = (COLS / 2) - i * xDir;
+    }
+    tl[0] = (LINES / 2) - 5 * yDir;
+    tl[1] = (COLS / 2) - 5 * xDir;
 
     // Main loop
     while(alive)
@@ -166,7 +135,7 @@ int main(int arc, char** argv)
 
         bod[0][0] = head[0];
         bod[0][1] = head[1];
-        
+
         // Draw contents to screen
         refresh();
 
