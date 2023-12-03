@@ -9,8 +9,6 @@
 #include <time.h>
 #include <unistd.h>
 
-// ----------------------------------------
-
 // Global Variables
 // ========================================
 
@@ -22,27 +20,28 @@ int gWidth;
 // Set height for the game
 int gHeight;
 
+// Function Prototypes
+// ========================================
+
 // [N.T.] Function for making the border of the snake pit
-void MakeBorder(int width, int height, char *borderSymbol);
+void makeBorder(int width, int height, char *borderSymbol);
 
-// [M.Q.] Function to generate a random number between min and max (inclusive)
-int getRandomNumber(int min, int max);
-
-// [M.Q.] Function to handle trophies
-void HandleTrophy(int *head, int (*bod)[2], int *sLength);
-
+// [S.C.] Function to initialize the snake's direction
+void initializeSnakeDirection(int *xDir, int *yDir);
+// [S.C.] Function to initialize the snake's length
+void initializeSnakeLength(int (*bod)[2], int sLength, int xDir, int yDir);
+// [A.C.] Function to change the direction of the snake
+void changeDirection(int input, int *xDir, int *yDir);
 // [M.Q.] Snake speed function
 int makeSnakeZoomZoom(int snakeLength);
 
-// [M.Q] Function to generate a random number between min and max (inclusive)
-int getRandomNumber(int min, int max) {
-    return rand() % (max - min + 1) + min;
-}
+// [M.Q.] Function to generate a random number between min and max (inclusive)
+int getRandomNumber(int min, int max);
+// [M.Q.] Function to handle trophies
+void handleTrophy(int *head, int (*bod)[2], int *sLength);
 
 // [S.C.] Function to end the game when the player loses
 void gameOver();
-
-// ----------------------------------------
 
 // Main Method
 // ========================================
@@ -95,42 +94,11 @@ int main(int arc, char **argv)
     // Value to expand snakes length by
     int sExpansion = 0;
 
-    // [S.C.] For the initial direction of the snake
-    int initDir = getRandomNumber(1, 4);
-    switch (initDir)
-    {
-        // Face right
-    case 1:
-        xDir = 0;
-        yDir = 1;
-        break;
-        // Face left
-    case 2:
-        xDir = 0;
-        yDir = -1;
-        break;
-        // Face up
-    case 3:
-        xDir = -1;
-        yDir = 0;
-        break;
-        // Face down
-    case 4:
-        xDir = 1;
-        yDir = 0;
-        break;
-    default:
-        break;
-    }
+    initializeSnakeDirection(&xDir, &yDir);
+    initializeSnakeLength(bod, sLength, xDir, yDir);
 
-    // [S.C.] Build the snake based on the random starting direction
-    for (int i = 0; i < 5; i++)
-    {
-        bod[i][0] = (gWidth / 2) - i * xDir;
-        bod[i][1] = (gHeight / 2) - i * yDir;
-    }
-    tl[0] = (gWidth / 2) - 5 * xDir;
-    tl[1] = (gHeight / 2) - 5 * yDir;
+    tl[0] = (gWidth / 2) - sLength * xDir;
+    tl[1] = (gHeight / 2) - sLength * yDir;
 
     // Main loop
     while (alive)
@@ -143,7 +111,7 @@ int main(int arc, char **argv)
 
         // [N.T.] Draw the border from the width, height, and symbol passed to the
         // function
-        MakeBorder(gWidth, gHeight, "\u2588");
+        makeBorder(gWidth, gHeight, "\u2588");
 
         // [S.C.] Print snake parts
         mvprintw(head[0], head[1], "S");
@@ -151,28 +119,7 @@ int main(int arc, char **argv)
             mvprintw(bod[i][0], bod[i][1], "$");
         mvprintw(tl[0], tl[1], "X");
 
-        // [A.C.] checks keypress to change direction, will add reverse check when
-        // ready
-        switch (input)
-        {
-        case KEY_UP:
-            xDir = -1;
-            yDir = 0;
-            break;
-        case KEY_DOWN:
-            xDir = 1;
-            yDir = 0;
-            break;
-        case KEY_LEFT:
-            xDir = 0;
-            yDir = -1;
-            break;
-        case KEY_RIGHT:
-            xDir = 0;
-            yDir = 1;
-        default:
-            break;
-        }
+        changeDirection(input, &xDir, &yDir);
 
         // [A.C.] Update head location
         head[0] += xDir;
@@ -201,7 +148,7 @@ int main(int arc, char **argv)
         int tmpLength = sLength;
 
         //
-        HandleTrophy(head, bod, &tmpLength);
+        handleTrophy(head, bod, &tmpLength);
 
         // [N.T.] Set sExpansion length
         if (tmpLength > sLength)
@@ -236,19 +183,16 @@ int main(int arc, char **argv)
     return 0;
 }
 
-// ----------------------------------------
-
 // The Snake Pit
-// ---
 // [N.T.]   [001] The snake pit is the area where the snake can move.
 // [N.T.]   [002] The snake pit must utilize all available space of the current terminal window.
 // [N.T.]   [003] The snake pit must have a visible border delineating the snake pit.
 // ========================================
 
-    // [001]
-    // [002]
-    // [003]
-void MakeBorder(int width, int height, char *borderSymbol)
+// [001]
+// [002]
+// [003]
+void makeBorder(int width, int height, char *borderSymbol)
 {
     // [N.T.] Draw loop for border
     for (int row = 0; row <= width; row++)
@@ -277,26 +221,85 @@ void MakeBorder(int width, int height, char *borderSymbol)
     }
 }
 
-// ----------------------------------------
-
 // The Snake
-// ---
 // [S.C.]   [004] The inital length of the snake is 5 characters.
 // [S.C.]   [005] Initial direction of the snake's movement is chosen randomly.
 // [A.C.]   [006] The user can press one of the four arrow keys to change the direction of the snake's movement.
 // [M.Q.]   [007] The snake's speed is proportional to its length.
-
 // ========================================
 
+// [004]
+void initializeSnakeLength(int (*bod)[2], int sLength, int xDir, int yDir) {
+    for (int i = 0; i < sLength; i++) {
+        bod[i][0] = (gWidth / 2) - i * xDir;
+        bod[i][1] = (gHeight / 2) - i * yDir;
+    }
+}
+
+// [005]
+void initializeSnakeDirection(int *xDir, int *yDir)
+{
+    int initDir = getRandomNumber(1, 4);
+    switch (initDir)
+    {
+    // Face right
+    case 1:
+        *xDir = 0;
+        *yDir = 1;
+        break;
+    // Face left
+    case 2:
+        *xDir = 0;
+        *yDir = -1;
+        break;
+    // Face up
+    case 3:
+        *xDir = -1;
+        *yDir = 0;
+        break;
+    // Face down
+    case 4:
+        *xDir = 1;
+        *yDir = 0;
+        break;
+    default:
+        break;
+    }
+}
+
+// [006]
+void changeDirection(int input, int *xDir, int *yDir)
+{
+    switch (input)
+    {
+    case KEY_UP:
+        *xDir = -1;
+        *yDir = 0;
+        break;
+    case KEY_DOWN:
+        *xDir = 1;
+        *yDir = 0;
+        break;
+    case KEY_LEFT:
+        *xDir = 0;
+        *yDir = -1;
+        break;
+    case KEY_RIGHT:
+        *xDir = 0;
+        *yDir = 1;
+        break;
+    default:
+        break;
+    }
+}
+
 // [007]
-int makeSnakeZoomZoom(int snakeLength) {
+int makeSnakeZoomZoom(int snakeLength)
+{
     return 200000 - snakeLength * 5000;
 }
 
-// ----------------------------------------
-
 // The Trophies
-// ---
 // [M.Q.]   [008] Trophies are represented by a digit randomly chosen from 1 to 9.
 // [M.Q.]   [009] There's always exactly one trophy in the snakepit at any given moment.
 // [N.T.]   [010] When the snake eats the trophy, its length is increased by the corresponding number of characters.
@@ -304,22 +307,30 @@ int makeSnakeZoomZoom(int snakeLength) {
 // [M.Q.]   [012] A new trophy is shown at a random location on the screen after the previous one has either expired or is eated by the snake.
 // ========================================
 
-void HandleTrophy(int* head, int(*bod)[2], int* sLength) {
-    static int trophyPosition[2] = { -1, -1 };
+int getRandomNumber(int min, int max)
+{
+    return rand() % (max - min + 1) + min;
+}
+
+void handleTrophy(int *head, int (*bod)[2], int *sLength)
+{
+    static int trophyPosition[2] = {-1, -1};
     static int trophyValue = 0;
     static time_t trophyExpirationTime = 0;
 
     static int distanceFromHead = 0;
 
     // [009]
-    if (head[0] == trophyPosition[0] && head[1] == trophyPosition[1]) {
+    if (head[0] == trophyPosition[0] && head[1] == trophyPosition[1])
+    {
         // [010]
         *sLength += trophyValue;
         trophyPosition[0] = -1;
         trophyPosition[1] = -1;
         trophyExpirationTime = 0;
     }
-    else if (time(NULL) >= trophyExpirationTime) {
+    else if (time(NULL) >= trophyExpirationTime)
+    {
         // [012]
         trophyPosition[0] = getRandomNumber(1, LINES - 2);
         trophyPosition[1] = getRandomNumber(1, COLS - 2);
@@ -333,11 +344,7 @@ void HandleTrophy(int* head, int(*bod)[2], int* sLength) {
     mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
 }
 
-
-// ----------------------------------------
-
 // The Gameplay
-// ---
 // [S.C.]   [013] The snake dies and the game ends if:
 //              It runs into the border; or
 //              It runs into itself; or
@@ -345,23 +352,21 @@ void HandleTrophy(int* head, int(*bod)[2], int* sLength) {
 // [A.C.]   [014] The user wins the game if the snake's length grows to the length equal to half the perimeter of the border.
 // ========================================
 
-// [S.C.] Function to end the game when the player loses
+// [013]
 void gameOver()
 {
     clear();
     refresh();
-    char arr[18] = { "Game Over You Lose" };
+    char arr[18] = {"Game Over You Lose"};
 
-    for (int i = 0; i <= 17; i++) {
+    for (int i = 0; i <= 17; i++)
+    {
         mvaddch(gWidth / 2, ((gHeight / 2) - 17) + i, arr[i]);
         refresh();
     }
     sleep(5);
     alive = false;
 }
-
-// ----------------------------------------
-
 
 // Misc Stuff
 // ========================================
