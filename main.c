@@ -4,90 +4,138 @@
 #include <wchar.h>
 #include <locale.h>
 #include <curses.h>
+#include <time.h>
 
-// Struct containing all of the border information
-struct border
-{
-    // Dimensions
-    int rows;
-    int columns;
-
-    // Symbol for border
-    char* borderSymbol;
-};
+void MakeBorder(int width, int height, char* borderSymbol);
 
 int main(int arc, char** argv)
 {
     // Set charset to allow for unicode characters
+    // Used for block character in screen border
     setlocale(LC_ALL, "");
 
     // Init curses screen
     initscr();
+
+    // Set dimensions for game
+    int width = LINES-1;
+    int height = COLS-1;
+
+    // Determines if game is currently running
+    // Switches off if player lost
+    bool alive = true;
     
-    // Init curses text color
-    start_color();
+    // Random num generator
+    srand((long)time(NULL));
 
-    // Instantiate border struct
-    struct border b;
+    noecho();	
+    	                        
+    curs_set(0);
 
+    //for using arrow keys
+    keypad(stdscr, TRUE);                   
+    nodelay(stdscr,TRUE);                	
+    clear();				
 
-    // Set dimensions for 
-    b.rows = LINES-1;
-    b.columns = COLS-1;
+    // initial snake setup
+    int head[2] = {LINES/2, COLS/2};
+    int bod[500][2] = {0};
+    bod[0][0] = LINES / 2;
+    bod[0][1] = COLS / 2;
+    int tl[2];
+    int lines = LINES;
+    int cols = COLS;
+    //determins up and down
+    int xDir;  
+    //determins left and right
+    int yDir;
+    //sets initial length    
+    int sLength = 5; 
 
-    // Set the border symbol
-    b.borderSymbol = "\u2588";
+/////For the initial direction of the snake
+    int initDir = rand() % 4 + 1;           
+    switch(initDir) {
+    // Face right
+    case 1:
+        xDir = 0;
+        yDir = 1;
+        bod[1][0] = LINES / 2;
+        bod[2][0] = LINES / 2;
+        bod[3][0] = LINES / 2;
+        bod[4][0] = LINES / 2;
+        tl[0] = LINES / 2;
+        bod[1][1] = (COLS / 2) - 1;
+        bod[2][1] = (COLS / 2) - 2;
+        bod[3][1] = (COLS / 2) - 3;
+        bod[4][1] = (COLS / 2) - 4;
+        tl[1] = (COLS / 2) - 3;
+        break;
+    // Face left
+    case 2:
+        xDir = 0;
+        yDir = -1;
+        bod[1][0] = LINES / 2;
+        bod[2][0] = LINES / 2;
+        bod[3][0] = LINES / 2;
+        bod[4][0] = LINES / 2;        
+        tl[0] = LINES / 2;
+        bod[1][1] = (COLS / 2) + 1;
+        bod[2][1] = (COLS / 2) + 2;
+        bod[3][1] = (COLS / 2) + 3;
+        bod[4][1] = (COLS / 2) + 4;
+        tl[1] = (COLS / 2) + 3;
+        break;
+    // Face up
+    case 3:
+        xDir = -1;
+        yDir = 0;
+        bod[1][0] = LINES / 2 + 1;
+        bod[2][0] = LINES / 2 + 2;
+        bod[3][0] = LINES / 2 + 3;
+        bod[4][0] = LINES / 2 + 4;        
+        tl[0] = LINES / 2 + 3;
+        bod[1][1] = (COLS / 2);
+        bod[2][1] = (COLS / 2);
+        bod[3][1] = (COLS / 2);
+        bod[4][1] = (COLS / 2);
+        tl[1] = (COLS / 2);
+        break;
+    // Face down
+    case 4:
+        xDir = 1;
+        yDir = 0;
+        bod[1][0] = LINES / 2 - 1;
+        bod[2][0] = LINES / 2 - 2;
+        bod[3][0] = LINES / 2 - 3;
+        bod[4][0] = LINES / 2 - 4;
+        tl[0] = LINES / 2 - 3;
+        bod[1][1] = (COLS / 2);
+        bod[2][1] = (COLS / 2);
+        bod[3][1] = (COLS / 2);
+        bod[4][1] = (COLS / 2);
+        tl[1] = (COLS / 2);
+        break;
 
-    // Set color pairs
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(2, COLOR_RED, COLOR_BLACK);
-
-    init_pair(3, COLOR_WHITE, COLOR_WHITE);
+    default:break;
+    }
 
     // Main loop
-    while(1)
+    while(alive)
     {
         // Clear screen
         clear();
 
-        // Draw loop
-        for (int height = 0; height <= b.rows; height++)
-        {
-            // Draw left side of the box
-            move(height, 0);
+        // Draw the border from the width, height, and symbol passed to the function
+        MakeBorder(width, height, "\u2588");
 
-            attron(COLOR_PAIR((height % 2 == 0) ? 1 : 2));
-            addstr(b.borderSymbol);
-            attroff(COLOR_PAIR((height % 2 == 0) ? 1 : 2));
-            
-            // Draw the right side of the box
-            move(height, b.columns);
-            attron(COLOR_PAIR((height % 2 == 0) ? 2 : 1));
-            addstr(b.borderSymbol);
-            attroff(COLOR_PAIR((height % 2 == 0) ? 2 : 1));
-
-            for (int width = 0; width <= b.columns; width++)
-            {
-                // GROUP NOTES: DRAW STUFF HERE
-
-                // Draw top and bottom of border box
-                if (height == 0 || height == b.rows)
-                {
-                    move(height, width);
-                    attron(COLOR_PAIR((height == b.rows) ? ((width % 2 == 0) ? 2 : 1) : ((width % 2 == 0) ? 1 : 2)));
-                    addstr(b.borderSymbol);
-                    attroff(COLOR_PAIR((height == b.rows) ? ((width % 2 == 0) ? 2 : 1) : ((width % 2 == 0) ? 1 : 2)));
-                }
-                // Else draw background
-                else if (width != 0 && width != b.columns)
-                {
-                    move(height, width);
-                    attron(COLOR_PAIR(3));
-                    addstr(b.borderSymbol);
-                    attroff(COLOR_PAIR(3));
-                }
-            }
-        }
+        /////Waits for user input, helps move snake accordingly
+        int in = getch();
+        mvprintw(tl[0], tl[1], " ");
+        mvprintw(bod[1][0], bod[1][1], "$");
+        mvprintw(bod[2][0], bod[2][1], "$");
+        mvprintw(bod[3][0], bod[3][1], "$");
+        mvprintw(bod[4][0], bod[4][1], "$");
+        mvprintw(head[0], head[1], "S");
 
         // Draw contents to screen
         refresh();
@@ -101,3 +149,56 @@ int main(int arc, char** argv)
 
     return 0;
 }
+
+void MakeBorder(int width, int height, char* borderSymbol)
+{
+    for (int row = 0; row <= width; row++)
+    {
+        // Draw left side of the box
+        move(row, 0);
+        addstr(borderSymbol);
+        
+        // Draw the right side of the box
+        move(row, height);
+        addstr(borderSymbol);
+
+        for (int column = 0; column <= height; column++)
+        {
+            // GROUP NOTES: DRAW STUFF HERE
+
+            // Draw top and bottom of border box
+            if (row == 0 || row == width)
+            {
+                // Set cursor to current row and column
+                move(row, column);
+                // Print border symbol
+                addstr(borderSymbol);
+            }
+        }
+    }
+}
+
+// NOTES:
+// COLORS EXAMPLE:
+
+/*
+
+    // Init curses text color
+    // start_color();
+
+    //Set color pairs
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+    init_pair(3, COLOR_BLACK, COLOR_BLACK);
+    init_pair(4, COLOR_WHITE, COLOR_WHITE);
+
+    // Draw left side of the box
+    move(row, 0);
+    attron(COLOR_PAIR((row % 2 == 0) ? 1 : 2));
+    addstr(b.borderSymbol);
+    attroff(COLOR_PAIR((row % 2 == 0) ? 1 : 2));
+
+*/
+
+
+
