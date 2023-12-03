@@ -9,55 +9,34 @@
 // [N.T.] Function for making the border of the snake pit
 void MakeBorder(int width, int height, char *borderSymbol);
 
-// ---- MQ ADDITIONS START (PRETTY UP COMMENTS LATER, BUT FOR NOW) ----- //
-
-// [M.Q] Function to generate a random number between min and max (inclusive)
+// Function to generate a random number between min and max (inclusive)
 int getRandomNumber(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
 
-// [MQ] Function to check if a position is occupied by the snake's body
-bool IsPositionOccupied(int x, int y, int (*bod)[2], int sLength) {
-    for (int i = 0; i < sLength; i++) {
-        if (bod[i][0] == x && bod[i][1] == y) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// [M.Q.] Function to handle trophies. It takes 3 parameters being pointers to the head, the body, and length of the snake.
+// [MQ] Function to handle trophies
 void HandleTrophy(int* head, int (*bod)[2], int* sLength) {
-
-    // [M.Q.] Self-explanatory variable declarations. One for storing the x and y coordinates of the trophy which is initialized at (-1, -1). The value of the trophy, as in the number of points that is given to the player once they collect it. This is initialized at 0. The last one for storing the expiration time for each trophy. This is separate from the value of the trophy that is listed on the screen
-    // [M.Q.] ADDITIONAL COMMENT, I have an idea for another extra credit point. We can have a settings section to have different modes enabled. In the default mode, we just have what the professor wants, but in additional modes, we change the behavior of things.
-    // [M.Q.] ADDITIONAL COMMENT CONT., for example, we could have a mode that hsa your snake speed change depending on the value of the trophy. I know this seems too similar to the base game, but something to bullshit the 1 point.
     static int trophyPosition[2] = {-1, -1};
     static int trophyValue = 0;
     static time_t trophyExpirationTime = 0;
 
-    // [M.Q] Checks if the head of the snake has the same coordinates as the trophy. If so, that means that the snake has eaten the trophy then resets the coordinates to (-1, -1) and expiration time to 0. EZ.
+    // Check if the trophy is eaten or expired
     if (head[0] == trophyPosition[0] && head[1] == trophyPosition[1]) {
         *sLength += trophyValue;
         trophyPosition[0] = -1;
         trophyPosition[1] = -1;
         trophyExpirationTime = 0;
-
     } else if (time(NULL) >= trophyExpirationTime) {
-        do {
-            trophyPosition[0] = getRandomNumber(1, LINES - 2);
-            trophyPosition[1] = getRandomNumber(1, COLS - 2);
-        } while (IsPositionOccupied(trophyPosition[0], trophyPosition[1], bod, *sLength));
-
+        // Generate a new trophy if the previous one expired
+        trophyPosition[0] = getRandomNumber(1, LINES - 2);
+        trophyPosition[1] = getRandomNumber(1, COLS - 2);
         trophyValue = getRandomNumber(1, 9);
-        trophyExpirationTime = time(NULL) + getRandomNumber(6, 9);
+        trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
 
     // Draw the trophy on the screen
     mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
 }
-
-// ---- MQ ADDITIONS END (PRETTY UP COMMENTS LATER, BUT FOR NOW) ----- //
 
 int main(int arc, char **argv) {
   // [N.T.] Set charset to allow for unicode characters
@@ -201,11 +180,7 @@ int main(int arc, char **argv) {
     bod[0][0] = head[0];
     bod[0][1] = head[1];
 
-    // ---- MQ ADDITIONS START (PRETTY UP COMMENTS LATER, BUT FOR NOW) ----- //
-
     HandleTrophy(head, bod, &sLength);
-
-    // ---- MQ ADDITIONS END (PRETTY UP COMMENTS LATER, BUT FOR NOW) ----- //
 
     // Draw contents to screen
     refresh();
