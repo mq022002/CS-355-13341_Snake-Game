@@ -131,7 +131,13 @@ int main(int arc, char** argv)
         head[0] += xDir;
         head[1] += yDir;
         tl[0] = bod[sLength-1][0];
-        tl[1] = bod[sLength-1][0];     
+        tl[1] = bod[sLength-1][0];   
+
+        //add more later for other conditions
+        for(int i = sLength - 1; i > 0; i--){
+            bod[i][0] = bod[i-1][0];
+            bod[i][1] = bod[i-1][1];
+        }  
 
         bod[0][0] = head[0];
         bod[0][1] = head[1];
@@ -196,6 +202,5 @@ void MakeBorder(int width, int height, char* borderSymbol)
     addstr(b.borderSymbol);
     attroff(COLOR_PAIR((row % 2 == 0) ? 1 : 2));
 */
-
 
 
