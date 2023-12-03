@@ -38,6 +38,8 @@ void HandleTrophy(int* head, int (*bod)[2], int* sLength) {
     static int trophyValue = 0;
     static time_t trophyExpirationTime = 0;
 
+    static int distanceFromHead = 0;
+
     // Check if the trophy is eaten or expired
     if (head[0] == trophyPosition[0] && head[1] == trophyPosition[1]) {
         *sLength += trophyValue;
@@ -46,8 +48,10 @@ void HandleTrophy(int* head, int (*bod)[2], int* sLength) {
         trophyExpirationTime = 0;
     } else if (time(NULL) >= trophyExpirationTime) {
         // Generate a new trophy if the previous one expired
-        trophyPosition[0] = getRandomNumber(1, LINES - 2);
-        trophyPosition[1] = getRandomNumber(1, COLS - 2);
+        //trophyPosition[0] = getRandomNumber(1, LINES - 2);
+        trophyPosition[0] = 5;
+        //trophyPosition[1] = getRandomNumber(1, COLS - 2);
+        trophyPosition[1] = 5;
         trophyValue = getRandomNumber(1, 9);
         trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
@@ -100,6 +104,8 @@ int main(int arc, char **argv) {
   int yDir;
   // Sets initial length
   int sLength = 5;
+  // Value to expand snakes length by
+  int sExpansion = 0;
 
   // [S.C.] For the initial direction of the snake
   int initDir = rand() % 4 + 1;
@@ -150,10 +156,8 @@ int main(int arc, char **argv) {
 
     // [S.C.] Print snake parts
     mvprintw(head[0], head[1], "S");
-    mvprintw(bod[1][0], bod[1][1], "$");
-    mvprintw(bod[2][0], bod[2][1], "$");
-    mvprintw(bod[3][0], bod[3][1], "$");
-    mvprintw(bod[4][0], bod[4][1], "$");
+    for (int i = 1; i < sLength - 1; i++)
+        mvprintw(bod[i][0], bod[i][1], "$");
     mvprintw(tl[0], tl[1], "X");
 
     // [A.C.] checks keypress to change direction, will add reverse check when
@@ -189,7 +193,7 @@ int main(int arc, char **argv) {
       bod[i][0] = bod[i - 1][0];
       bod[i][1] = bod[i - 1][1];
 
-      //[S.C] End condition if head hits a body part
+      // [S.C] End condition if head hits a body part
       if( head[0] == bod[i][0] && head[1] == bod[i][1]){
         gameOver();
       }
@@ -199,7 +203,21 @@ int main(int arc, char **argv) {
     bod[0][0] = head[0];
     bod[0][1] = head[1];
 
-    HandleTrophy(head, bod, &sLength);
+    // Make temp length = to sLength
+    int tmpLength = sLength;
+
+    HandleTrophy(head, bod, &tmpLength);
+
+    // [N.T.] Set sExpansion length
+    if (tmpLength > sLength)
+        sExpansion = tmpLength - sLength;
+
+    // [N.T.] Increase sLength by 1 every frame until sExpansion = 0
+    if (sExpansion > 0)
+    {
+        sLength++;
+        sExpansion--;
+    }
 
     // Draw contents to screen
     refresh();
@@ -207,7 +225,7 @@ int main(int arc, char **argv) {
     // Screen refresh rate
     sleep(1);
     
-    //[S.C] Condition to end game if hitting boarder
+    // [S.C] Condition to end game if hitting boarder
     if(head[0] == 0 || head[0] >= LINES - 1 || head[1] == 0 || head[1] >= COLS - 1 ){
         gameOver();
     }
