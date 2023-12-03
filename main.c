@@ -115,7 +115,7 @@ int main(int arc, char **argv)
 
         // [S.C.] Print snake parts
         mvprintw(head[0], head[1], "S");
-        for (int i = 1; i < sLength - 1; i++)
+        for (int i = 1; i < sLength; i++)
             mvprintw(bod[i][0], bod[i][1], "$");
         mvprintw(tl[0], tl[1], "X");
 
@@ -229,8 +229,10 @@ void makeBorder(int width, int height, char *borderSymbol)
 // ========================================
 
 // [004]
-void initializeSnakeLength(int (*bod)[2], int sLength, int xDir, int yDir) {
-    for (int i = 0; i < sLength; i++) {
+void initializeSnakeLength(int (*bod)[2], int sLength, int xDir, int yDir)
+{
+    for (int i = 0; i < sLength; i++)
+    {
         bod[i][0] = (gWidth / 2) - i * xDir;
         bod[i][1] = (gHeight / 2) - i * yDir;
     }
