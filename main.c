@@ -9,9 +9,27 @@
 // [N.T.] Function for making the border of the snake pit
 void MakeBorder(int width, int height, char *borderSymbol);
 
+// Determines if game is currently running
+// Switches off if player lost
+bool alive = true;
+
 // Function to generate a random number between min and max (inclusive)
 int getRandomNumber(int min, int max) {
     return rand() % (max - min + 1) + min;
+}
+
+// [S.C] Function to end the game when the player loses
+void gameOver() {  	                                        
+	clear();
+	refresh();
+    char arr[18]={"Game Over You Lose"};
+
+    for(int i = 0; i <= 17; i++) { 
+        mvaddch(LINES/2, ((COLS/2) - 17) + i, arr[i]);
+        refresh();          
+    }
+    sleep(5);    
+    alive=false;
 }
 
 // [MQ] Function to handle trophies
@@ -49,10 +67,6 @@ int main(int arc, char **argv) {
   // Set dimensions for game
   int width = LINES - 1;
   int height = COLS - 1;
-
-  // Determines if game is currently running
-  // Switches off if player lost
-  bool alive = true;
 
   // Seed for random num generator
   srand((long)time(NULL));
@@ -174,6 +188,11 @@ int main(int arc, char **argv) {
     for (int i = sLength - 1; i > 0; i--) {
       bod[i][0] = bod[i - 1][0];
       bod[i][1] = bod[i - 1][1];
+
+      //[S.C] End condition if head hits a body part
+      if( head[0] == bod[i][0] && head[1] == bod[i][1]){
+        gameOver();
+      }
     }
 
     // [A.C.] Update body position
@@ -187,6 +206,12 @@ int main(int arc, char **argv) {
 
     // Screen refresh rate
     sleep(1);
+    
+    //[S.C] Condition to end game if hitting boarder
+    if(head[0] == 0 || head[0] >= LINES - 1 || head[1] == 0 || head[1] >= COLS - 1 ){
+        gameOver();
+    }
+    
   }
 
   // Cleanup
