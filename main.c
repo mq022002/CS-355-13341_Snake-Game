@@ -43,6 +43,9 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength);
 // [S.C.] Function to end the game when the player loses
 void gameOver();
 
+// [A.C.] Function to end the game when the player wins
+void victory();
+
 // Main Method
 // ========================================
 
@@ -166,6 +169,10 @@ int main(int arc, char **argv)
         // [S.C] Condition to end game if hitting boarder
         if (head[0] == 0 || head[0] >= gWidth || head[1] == 0 || head[1] >= gHeight)
             gameOver();
+        
+        // [A.C.] Condition to end game if win condition is met
+        if (sLength == (gWidth*2+gHeight*2)/2)
+            victory();            
 
         /**** DRAW / REFRESH SCREEN ****/
 
@@ -224,7 +231,7 @@ void makeBorder(int width, int height, char *borderSymbol)
 // The Snake
 // [S.C.]   [004] The inital length of the snake is 5 characters.
 // [S.C.]   [005] Initial direction of the snake's movement is chosen randomly.
-// [A.C.]   [006] The user can press one of the four arrow keys to change the direction of the snake's movement.
+// [A.C.]   [006] The user can press either one of the four arrow keys or WASD to change the direction of the snake's movement.
 // [M.Q.]   [007] The snake's speed is proportional to its length.
 // ========================================
 
@@ -287,6 +294,22 @@ void changeDirection(int input, int *xDir, int *yDir)
         *yDir = -1;
         break;
     case KEY_RIGHT:
+        *xDir = 0;
+        *yDir = 1;
+        break;
+    case 'w':
+        *xDir = -1;
+        *yDir = 0;
+        break;
+    case 's':
+        *xDir = 1;
+        *yDir = 0;
+        break;
+    case 'a':
+        *xDir = 0;
+        *yDir = -1;
+        break;
+    case 'd':
         *xDir = 0;
         *yDir = 1;
         break;
@@ -364,6 +387,21 @@ void gameOver()
     for (int i = 0; i <= 17; i++)
     {
         mvaddch(gWidth / 2, ((gHeight / 2) - 17) + i, arr[i]);
+        refresh();
+    }
+    sleep(5);
+    alive = false;
+}
+//[014]
+void victory()
+{
+    clear();
+    refresh();
+    char arr[8] = {"You win!"};
+
+    for (int i = 0; i <= 7; i++)
+    {
+        mvaddch(gWidth / 2, ((gHeight / 2) - 7) + i, arr[i]);
         refresh();
     }
     sleep(5);
