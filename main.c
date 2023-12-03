@@ -25,19 +25,20 @@ int main(int arc, char** argv)
     // Switches off if player lost
     bool alive = true;
     
-    // Random num generator
+    // Seed for random num generator
     srand((long)time(NULL));
 
+    // Turn off console Echo
     noecho();	
-    	                        
+
+    // Ignores cursor as input
     curs_set(0);
 
-    //for using arrow keys
+    // For using arrow keys
     keypad(stdscr, TRUE);                   
-    nodelay(stdscr,TRUE);                	
-    clear();				
+    nodelay(stdscr,TRUE);
 
-    // initial snake setup
+    // Initial snake setup
     int head[2] = {LINES/2, COLS/2};
     int bod[500][2] = {0};
     bod[0][0] = LINES / 2;
@@ -45,14 +46,14 @@ int main(int arc, char** argv)
     int tl[2];
     int lines = LINES;
     int cols = COLS;
-    //determins up and down
+    // Determins up and down
     int xDir;  
-    //determins left and right
+    // Determins left and right
     int yDir;
-    //sets initial length    
+    // Sets initial length    
     int sLength = 5; 
 
-/////For the initial direction of the snake
+    // For the initial direction of the snake
     int initDir = rand() % 4 + 1;           
     switch(initDir) {
     // Face right
@@ -128,7 +129,7 @@ int main(int arc, char** argv)
         // Draw the border from the width, height, and symbol passed to the function
         MakeBorder(width, height, "\u2588");
 
-        /////Waits for user input, helps move snake accordingly
+        // Waits for user input, helps move snake accordingly
         int in = getch();
         mvprintw(tl[0], tl[1], " ");
         mvprintw(bod[1][0], bod[1][1], "$");
@@ -182,7 +183,6 @@ void MakeBorder(int width, int height, char* borderSymbol)
 // COLORS EXAMPLE:
 
 /*
-
     // Init curses text color
     // start_color();
 
@@ -197,7 +197,6 @@ void MakeBorder(int width, int height, char* borderSymbol)
     attron(COLOR_PAIR((row % 2 == 0) ? 1 : 2));
     addstr(b.borderSymbol);
     attroff(COLOR_PAIR((row % 2 == 0) ? 1 : 2));
-
 */
 
 
