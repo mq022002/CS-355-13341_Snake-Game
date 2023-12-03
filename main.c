@@ -93,7 +93,7 @@ int main(int arc, char **argv)
     // Determins left and right
     int yDir;
     // Sets initial length
-    int sLength = 90;
+    int sLength = 5;
     // Value to expand snakes length by
     int sExpansion = 0;
 
