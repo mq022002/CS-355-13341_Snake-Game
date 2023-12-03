@@ -93,7 +93,7 @@ int main(int arc, char **argv)
     // Determins left and right
     int yDir;
     // Sets initial length
-    int sLength = 5;
+    int sLength = 90;
     // Value to expand snakes length by
     int sExpansion = 0;
 
@@ -171,7 +171,7 @@ int main(int arc, char **argv)
             gameOver();
 
         // [A.C.] Condition to end game if win condition is met
-        if (sLength >= (gWidth * 2 + gHeight * 2) / 2)
+        if (sLength == (gWidth * 2 + gHeight * 2) / 2)
             victory();
 
         /**** DRAW / REFRESH SCREEN ****/
