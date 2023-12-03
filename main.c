@@ -164,7 +164,7 @@ int main(int arc, char **argv)
         /**** END-GAME CONDITIONS ****/
 
         // [S.C] Condition to end game if hitting boarder
-        if (head[0] == 0 || head[0] >= gWidth - 1 || head[1] == 0 || head[1] >= gHeight - 1)
+        if (head[0] == 0 || head[0] >= gWidth || head[1] == 0 || head[1] >= gHeight)
             gameOver();
 
         /**** DRAW / REFRESH SCREEN ****/
