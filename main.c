@@ -118,7 +118,7 @@ int main(int arc, char** argv)
         break;
 
     default:break;
-    }
+    }    
 
     // Main loop
     while(alive)
@@ -130,7 +130,7 @@ int main(int arc, char** argv)
         MakeBorder(width, height, "\u2588");
 
         // Waits for user input, helps move snake accordingly
-        int in = getch();
+        int input = getch();
         mvprintw(tl[0], tl[1], " ");
         mvprintw(bod[1][0], bod[1][1], "$");
         mvprintw(bod[2][0], bod[2][1], "$");
@@ -138,6 +138,35 @@ int main(int arc, char** argv)
         mvprintw(bod[4][0], bod[4][1], "$");
         mvprintw(head[0], head[1], "S");
 
+        //[A.C.] checks keypress to change direction, will add reverse check when ready
+        switch(input){
+            case KEY_UP:
+                xDir = -1;
+                yDir = 0;
+                break;
+            case KEY_DOWN: 
+                xDir = 1;
+                yDir = 0;
+                break;
+            case KEY_LEFT:
+                xDir = 0;
+                yDir = -1;
+                break;
+            case KEY_RIGHT:
+                xDir = 0;
+                yDir = 1;
+            default:
+                break;
+        }
+
+        head[0] += xDir;
+        head[1] += yDir;
+        tl[0] = bod[sLength-1][0];
+        tl[1] = bod[sLength-1][0];     
+
+        bod[0][0] = head[0];
+        bod[0][1] = head[1];
+        
         // Draw contents to screen
         refresh();
 
