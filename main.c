@@ -135,12 +135,12 @@ int main(int arc, char **argv) {
     MakeBorder(width, height, "\u2588");
 
     // [S.C.] Print snake parts
-    mvprintw(tl[0], tl[1], "X");
+    mvprintw(head[0], head[1], "S");
     mvprintw(bod[1][0], bod[1][1], "$");
     mvprintw(bod[2][0], bod[2][1], "$");
     mvprintw(bod[3][0], bod[3][1], "$");
     mvprintw(bod[4][0], bod[4][1], "$");
-    mvprintw(head[0], head[1], "S");
+    mvprintw(tl[0], tl[1], "X");
 
     // [A.C.] checks keypress to change direction, will add reverse check when
     // ready
@@ -168,7 +168,7 @@ int main(int arc, char **argv) {
     head[0] += xDir;
     head[1] += yDir;
     tl[0] = bod[sLength - 1][0];
-    tl[1] = bod[sLength - 1][0];
+    tl[1] = bod[sLength - 1][1];
 
     // [A.C.] Add more later for other conditions
     for (int i = sLength - 1; i > 0; i--) {
