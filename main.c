@@ -622,8 +622,7 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
             break;
         }
         // [008]
-        //trophyValue = getRandomNumber(1, 9);
-        trophyValue = 9999;
+        trophyValue = getRandomNumber(1, 9);
         // [011]
         trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
