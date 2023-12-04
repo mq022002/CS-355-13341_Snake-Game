@@ -180,10 +180,14 @@ int main(int arc, char **argv)
             {
                 gameOver();
             }
+        }
 
-            // [N.T.] End condition of snake hits other snake
-            if (head[0] == bod2[i][0] && head[1] == bod2[i][1])
-                gameOver();
+        if (isMultiplayer)
+        {
+            // End condition of snake hits other snake
+            for (int i = sLength2 - 1; i > 0; i--)
+                if (head[0] == bod2[i][0] && head[1] == bod2[i][1])
+                    gameOver();
         }
 
         // [A.C.] Update body position
@@ -245,10 +249,12 @@ int main(int arc, char **argv)
                 {
                     gameOver();
                 }
-                // Snake hits other snake
+            }
+
+            // Snake hits other snake
+            for (int i = sLength - 1; i > 0; i--)
                 if (head2[0] == bod[i][0] && head2[1] == bod[i][1])
                     gameOver();
-            }
 
             // Update snake 2 body position
             bod2[0][0] = head2[0];
