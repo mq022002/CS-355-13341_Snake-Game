@@ -46,7 +46,7 @@ int makeSnakeZoomZoom(int snakeLength);
 // [M.Q.] Function to generate a random number between min and max (inclusive)
 int getRandomNumber(int min, int max);
 // [M.Q.] Function to handle trophies
-void handleTrophy(int *head, int (*bod)[2], int *sLength, int currentSnake);
+void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLength2, int currentSnake);
 
 // [S.C.] Function to end the game when the player loses
 void gameOver();
@@ -198,7 +198,7 @@ int main(int arc, char **argv)
         int tmpLength = sLength;
 
         // Trophy collision
-        handleTrophy(head, bod, &tmpLength, 1);
+        handleTrophy(head, bod, &tmpLength, sLength, sLength2, 1);
 
         // [N.T.] Set sExpansion length
         if (tmpLength > sLength)
@@ -218,7 +218,7 @@ int main(int arc, char **argv)
             gameOver();
 
         // [A.C.] Condition to end game if win condition is met
-        if (sLength == (gWidth * 2 + gHeight * 2) / 2)
+        if (score >= (gWidth * 2 + gHeight * 2) / 2)
             victory();
 
         /**** SNAKE 2 ****/
@@ -263,7 +263,7 @@ int main(int arc, char **argv)
             int tmpLength2 = sLength2;
 
             // Trophy collision for snake 2
-            handleTrophy(head2, bod2, &tmpLength2, 2);
+            handleTrophy(head2, bod2, &tmpLength2, sLength, sLength2, 2);
 
             // Set sExpansion2 length
             if (tmpLength2 > sLength2)
@@ -283,7 +283,7 @@ int main(int arc, char **argv)
                 gameOver();
 
             // [A.C.] Condition to end game if win condition is met
-            if (sLength2 + sLength == (gWidth * 2 + gHeight * 2) / 2)
+            if (score + score2 >= (gWidth * 2 + gHeight * 2) / 2)
                 victory();
 
         }
@@ -575,7 +575,7 @@ int getRandomNumber(int min, int max)
     return rand() % (max - min + 1) + min;
 } // getRandomNumber
 
-void handleTrophy(int *head, int (*bod)[2], int *sLength, int currentSnake)
+void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLength2, int currentSnake)
 {
     static int trophyPosition[2] = {-1, -1};
     static int trophyValue = 0;
@@ -600,16 +600,30 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int currentSnake)
         // [012]
         // What if the trophy is too far from the snake regarding the snake’s speed?
         // What about the random locations on the border of your screen?
-        do
+        while (true)
         {
             trophyPosition[0] = getRandomNumber(1, gWidth - 2);
             trophyPosition[1] = getRandomNumber(1, gHeight - 2);
-        } while (abs(head[0] - trophyPosition[0]) +
-                     abs(head[1] - trophyPosition[1]) >
-                 *sLength);
 
+            /*** Check if trophy is located in snake 1 ***/
+            for (int i = 0; i < sLength1 - 1; i++)
+                if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
+                    trophyPosition[0] = -1;
+
+            /*** Check if trophy is located in snake 2 ***/ 
+            for (int i = 0; i < sLength2 - 1; i++)
+                if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
+                    trophyPosition[0] = -1;
+
+            // Restart loop if trophy is inside the snake to reset the trophy position
+            if (trophyPosition[0] == -1)
+                continue;
+
+            break;
+        }
         // [008]
-        trophyValue = getRandomNumber(1, 9);
+        //trophyValue = getRandomNumber(1, 9);
+        trophyValue = 9999;
         // [011]
         trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
