@@ -283,7 +283,7 @@ int main(int arc, char **argv)
                 gameOver();
 
             // [A.C.] Condition to end game if win condition is met
-            if (sLength2 == (gWidth * 2 + gHeight * 2) / 2)
+            if (sLength2 + sLength == (gWidth * 2 + gHeight * 2) / 2)
                 victory();
 
         }
