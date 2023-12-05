@@ -568,8 +568,8 @@ int makeSnakeZoomZoom(int snakeLength)
 // [M.Q.]   [011]   A trophy expires after a random interval from 1 to 9 seconds
 // [M.Q.]   [012]   A new trophy is shown at a random location on the screen after the previous one has either expired or is eated by the snake.
 // [M.Q.]   [S001]  How did you manage displaying and changing the location of trophy?
-// [M.Q.]   [S002]  What about the random locations on the border of your screen?
-// [M.Q.]   [S003]  What if the trophy is too far from the snake regarding the snake’s speed?
+// [N.T.]   [S002]  What about the random locations on the border of your screen?
+// [N.T.]   [S003]  What if the trophy is too far from the snake regarding the snake’s speed?
 // [A.C.]   [S004]  How do you add points if the snake eats the trophy?
 // ========================================
 
@@ -641,7 +641,7 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
 //                      The user attempts to reverse the snake's direction.
 // [A.C.]   [014]   The user wins the game if the snake's length grows to the length equal to half the perimeter of the border.
 // [M.Q.]   [S005]  Do you display total points for the player?
-// [M.Q]    [S006]  Does your program handle interrupt signal to end the game?
+// [?.?.]    [S006]  Does your program handle interrupt signal to end the game?
 // ========================================
 
 // [013]
