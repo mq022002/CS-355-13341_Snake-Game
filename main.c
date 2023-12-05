@@ -578,8 +578,7 @@ int getRandomNumber(int min, int max)
     return rand() % (max - min + 1) + min;
 } // getRandomNumber
 
-void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1,
-                  int sLength2, int currentSnake)
+void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLength2, int currentSnake)
 {
     static int trophyPosition[2] = {-1, -1};
     static int trophyValue = 0;
@@ -602,45 +601,37 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1,
     else if (time(NULL) >= trophyExpirationTime)
     {
         // [012]
-        do
+        // What if the trophy is too far from the snake regarding the snake’s speed?
+        // What about the random locations on the border of your screen?
+        while (true)
         {
-            while (true)
-            {
-                trophyPosition[0] = getRandomNumber(1, gWidth - 2);
-                trophyPosition[1] = getRandomNumber(1, gHeight - 2);
+            trophyPosition[0] = getRandomNumber(1, gWidth - 2);
+            trophyPosition[1] = getRandomNumber(1, gHeight - 2);
 
-                // [S002]
-                if (trophyPosition[0] == 1 || trophyPosition[0] == gWidth - 2 ||
-                    trophyPosition[1] == 1 || trophyPosition[1] == gHeight - 2)
-                    continue;
+            /*** Check if trophy is located in snake 1 ***/
+            for (int i = 0; i < sLength1 - 1; i++)
+                if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
+                    trophyPosition[0] = -1;
 
-                // Check if trophy is located in snake 1
-                for (int i = 0; i < sLength1 - 1; i++)
-                    if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
-                        trophyPosition[0] = -1;
+            /*** Check if trophy is located in snake 2 ***/
+            for (int i = 0; i < sLength2 - 1; i++)
+                if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
+                    trophyPosition[0] = -1;
 
-                // Check if trophy is located in snake 2
-                for (int i = 0; i < sLength2 - 1; i++)
-                    if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
-                        trophyPosition[0] = -1;
+            // Restart loop if trophy is inside the snake to reset the trophy position
+            if (trophyPosition[0] == -1)
+                continue;
 
-                // Restart loop if trophy is inside the snake to reset the trophy position
-                if (trophyPosition[0] == -1)
-                    continue;
-
-                break;
-            }
-
-            // [008]
-            trophyValue = getRandomNumber(1, 9);
-            // [011]
-            // [S003]
-            trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
-        } while (abs(head[0] - trophyPosition[0]) + abs(head[1] - trophyPosition[1]) > *sLength);
-
-        // [S001]
-        mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
+            break;
+        }
+        // [008]
+        trophyValue = getRandomNumber(1, 9);
+        // [011]
+        trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
+
+    // How did you manage displaying and changing the location of trophy?
+    mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
 } // handleTrophy
 
 // The Gameplay
