@@ -156,11 +156,6 @@ int main(int arc, char **argv)
         // function
         makeBorder(gWidth, gHeight, "\u2588");
 
-        // [S.C.] Print snake parts
-        mvprintw(head[0], head[1], "S");
-        for (int i = 1; i < sLength; i++)
-            mvprintw(bod[i][0], bod[i][1], "$");
-
         changeDirection(input, &xDir, &yDir, true);
 
         // [A.C.] Update head location
@@ -185,7 +180,7 @@ int main(int arc, char **argv)
         if (isMultiplayer)
         {
             // End condition of snake hits other snake
-            for (int i = sLength2 - 1; i > 0; i--)
+            for (int i = sLength2 - 1; i >= 0; i--)
                 if (head[0] == bod2[i][0] && head[1] == bod2[i][1])
                     gameOver();
         }
@@ -214,7 +209,7 @@ int main(int arc, char **argv)
         /**** END-GAME CONDITIONS ****/
 
         // [S.C] Condition to end game if hitting boarder
-        if (head[0] == 0 || head[0] >= gWidth || head[1] == 0 || head[1] >= gHeight)
+        if (head[0] <= 0 || head[0] >= gWidth || head[1] <= 0 || head[1] >= gHeight)
             gameOver();
 
         // [A.C.] Condition to end game if win condition is met
@@ -225,11 +220,6 @@ int main(int arc, char **argv)
 
         if (isMultiplayer)
         {
-            // Print snake 2
-            mvprintw(head2[0], head2[1], "S");
-            for (int i = 1; i < sLength2; i++)
-                mvprintw(bod2[i][0], bod2[i][1], "$");
-
             changeDirection(input, &xDir2, &yDir2, false);
 
             // Update snake 2 head location
@@ -252,7 +242,7 @@ int main(int arc, char **argv)
             }
 
             // Snake hits other snake
-            for (int i = sLength - 1; i > 0; i--)
+            for (int i = sLength - 1; i >= 0; i--)
                 if (head2[0] == bod[i][0] && head2[1] == bod[i][1])
                     gameOver();
 
@@ -278,14 +268,19 @@ int main(int arc, char **argv)
 
             /**** END-GAME CONDITIONS ****/
 
+            // Print snake 2
+            mvprintw(head2[0], head2[1], "S");
+            for (int i = 1; i < sLength2; i++)
+                mvprintw(bod2[i][0], bod2[i][1], "$");
+
             // [S.C] Condition to end game if hitting boarder
-            if (head2[0] == 0 || head2[0] >= gWidth || head2[1] == 0 || head2[1] >= gHeight)
+            if (head2[0] <= 0 || head2[0] >= gWidth || head2[1] <= 0 || head2[1] >= gHeight)
                 gameOver();
 
             // [A.C.] Condition to end game if win condition is met
             if (score + score2 >= (gWidth * 2 + gHeight * 2) / 2)
                 victory();
-
+        
         }
 
         // [A.C.] Print Score
@@ -294,6 +289,11 @@ int main(int arc, char **argv)
             mvprintw(0, 12, "Score 2: %d", score2); 
             
         /**** DRAW / REFRESH SCREEN ****/
+
+        // [S.C.] Print snake parts
+        mvprintw(head[0], head[1], "S");
+        for (int i = 1; i < sLength; i++)
+            mvprintw(bod[i][0], bod[i][1], "$");
 
         // Draw contents to screen
         refresh();
