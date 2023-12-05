@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -25,6 +26,9 @@ bool isMultiplayer = false;
 int score = 0;
 // Score for second snake
 int score2 = 0;
+// Snake speed variables
+int baseSleepTime = 300000;
+int lengthMultiplier = 2000;
 
 // Function Prototypes
 // ========================================
@@ -46,7 +50,8 @@ int makeSnakeZoomZoom(int snakeLength);
 // [M.Q.] Function to generate a random number between min and max (inclusive)
 int getRandomNumber(int min, int max);
 // [M.Q.] Function to handle trophies
-void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLength2, int currentSnake);
+void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1,
+                  int sLength2, int currentSnake);
 
 // [S.C.] Function to end the game when the player loses
 void gameOver();
@@ -135,7 +140,7 @@ int main(int arc, char **argv)
         bod2[0][1] = head2[1];
 
         // Snake 2 initial direction is same initial direction as snake 1
-        xDir2 = xDir; 
+        xDir2 = xDir;
         yDir2 = yDir;
         initializeSnakeLength(bod2, sLength2, xDir2, yDir2);
 
@@ -274,20 +279,20 @@ int main(int arc, char **argv)
                 mvprintw(bod2[i][0], bod2[i][1], "$");
 
             // [S.C] Condition to end game if hitting boarder
-            if (head2[0] <= 0 || head2[0] >= gWidth || head2[1] <= 0 || head2[1] >= gHeight)
+            if (head2[0] <= 0 || head2[0] >= gWidth || head2[1] <= 0 ||
+                head2[1] >= gHeight)
                 gameOver();
 
             // [A.C.] Condition to end game if win condition is met
             if (score + score2 >= (gWidth * 2 + gHeight * 2) / 2)
                 victory();
-        
         }
 
         // [A.C.] Print Score
-        mvprintw(0, 0, "Score: %d", score); 
+        mvprintw(0, 0, "Score: %d", score);
         if (isMultiplayer)
-            mvprintw(0, 12, "Score 2: %d", score2); 
-            
+            mvprintw(0, 12, "Score 2: %d", score2);
+
         /**** DRAW / REFRESH SCREEN ****/
 
         // [S.C.] Print snake parts
@@ -300,7 +305,8 @@ int main(int arc, char **argv)
 
         // Screen refresh rate
         // Use fastes snake speed
-        int snakeSpeed = makeSnakeZoomZoom((sLength > sLength2) ? sLength : sLength2);
+        int snakeSpeed =
+            makeSnakeZoomZoom((sLength > sLength2) ? sLength : sLength2);
         usleep(snakeSpeed);
     }
 
@@ -311,10 +317,9 @@ int main(int arc, char **argv)
 }
 
 // The Snake Pit
-// [N.T.]   [001] The snake pit is the area where the snake can move.
-// [N.T.]   [002] The snake pit must utilize all available space of the current
-// terminal window. [N.T.]   [003] The snake pit must have a visible border
-// delineating the snake pit.
+// [N.T.]   [001]   The snake pit is the area where the snake can move.
+// [N.T.]   [002]   The snake pit must utilize all available space of the current terminal window.
+// [N.T.]   [003]   The snake pit must have a visible border delineating the snake pit.
 // ========================================
 
 // [001]
@@ -353,10 +358,10 @@ void initializeStartMenu()
 {
     // Initialize colors
     start_color();
-    
+
     bool startMenuActive = true;
     int currentSelection = 0;
-    
+
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
 
     while (startMenuActive)
@@ -371,9 +376,9 @@ void initializeStartMenu()
 
         if (currentSelection == 1)
             attron(COLOR_PAIR(1));
-        
+
         mvprintw(gWidth / 2 + 1, gHeight / 2 - 3, "* SINGLE-PLAYER");
-        
+
         if (currentSelection == 1)
             attroff(COLOR_PAIR(1));
 
@@ -420,11 +425,10 @@ void initializeStartMenu()
 }
 
 // The Snake
-// [S.C.]   [004] The inital length of the snake is 5 characters.
-// [S.C.]   [005] Initial direction of the snake's movement is chosen randomly.
-// [A.C.]   [006] The user can press either one of the four arrow keys or WASD
-// to change the direction of the snake's movement. [M.Q.]   [007] The snake's
-// speed is proportional to its length.
+// [S.C.]   [004]   The inital length of the snake is 5 characters.
+// [S.C.]   [005]   Initial direction of the snake's movement is chosen randomly.
+// [A.C.]   [006]   The user can press either one of the four arrow keys or WASD to change the direction of the snake's movement.
+// [M.Q.]   [007]   The snake's speed is proportional to its length.
 // ========================================
 
 // [004]
@@ -477,97 +481,97 @@ void changeDirection(int input, int *xDir, int *yDir, bool WASD)
         {
             switch (input)
             {
-                case 'w':
-                    *xDir = -1;
-                    *yDir = 0;
-                    break;
-                case 's':
-                    *xDir = 1;
-                    *yDir = 0;
-                    break;
-                case 'a':
-                    *xDir = 0;
-                    *yDir = -1;
-                    break;
-                case 'd':
-                    *xDir = 0;
-                    *yDir = 1;
-                    break;
-            default:
-                break;
-            }
-        }
-        else 
-        {
-            switch (input)
-            {
-                case KEY_UP:
-                    *xDir = -1;
-                    *yDir = 0;
-                    break;
-                case KEY_DOWN:
-                    *xDir = 1;
-                    *yDir = 0;
-                    break;
-                case KEY_LEFT:
-                    *xDir = 0;
-                    *yDir = -1;
-                    break;
-                case KEY_RIGHT:
-                    *xDir = 0;
-                    *yDir = 1;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    else 
-    {
-        switch (input)
-        {
-            case KEY_UP:
             case 'w':
                 *xDir = -1;
                 *yDir = 0;
                 break;
-            case KEY_DOWN:
             case 's':
                 *xDir = 1;
                 *yDir = 0;
                 break;
-            case KEY_LEFT:
             case 'a':
                 *xDir = 0;
                 *yDir = -1;
                 break;
-            case KEY_RIGHT:
             case 'd':
                 *xDir = 0;
                 *yDir = 1;
                 break;
             default:
                 break;
+            }
+        }
+        else
+        {
+            switch (input)
+            {
+            case KEY_UP:
+                *xDir = -1;
+                *yDir = 0;
+                break;
+            case KEY_DOWN:
+                *xDir = 1;
+                *yDir = 0;
+                break;
+            case KEY_LEFT:
+                *xDir = 0;
+                *yDir = -1;
+                break;
+            case KEY_RIGHT:
+                *xDir = 0;
+                *yDir = 1;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    else
+    {
+        switch (input)
+        {
+        case KEY_UP:
+        case 'w':
+            *xDir = -1;
+            *yDir = 0;
+            break;
+        case KEY_DOWN:
+        case 's':
+            *xDir = 1;
+            *yDir = 0;
+            break;
+        case KEY_LEFT:
+        case 'a':
+            *xDir = 0;
+            *yDir = -1;
+            break;
+        case KEY_RIGHT:
+        case 'd':
+            *xDir = 0;
+            *yDir = 1;
+            break;
+        default:
+            break;
         }
     }
 } // changeDirection
 
 // [007]
-int makeSnakeZoomZoom(int snakeLength) {
-    int baseSleepTime = 300000;
-    int lengthMultiplier = 2000;
+int makeSnakeZoomZoom(int snakeLength)
+{
     return baseSleepTime - snakeLength * lengthMultiplier;
 }
 
-
 // The Trophies
-// [M.Q.]   [008] Trophies are represented by a digit randomly chosen from 1
-// to 9. [M.Q.]   [009] There's always exactly one trophy in the snakepit at any
-// given moment. [N.T.]   [010] When the snake eats the trophy, its length is
-// increased by the corresponding number of characters. [M.Q.]   [011] A trophy
-// expires after a random interval from 1 to 9 seconds [M.Q.]   [012] A new
-// trophy is shown at a random location on the screen after the previous one has
-// either expired or is eated by the snake.
+// [M.Q.]   [008]   Trophies are represented by a digit randomly chosen from 1 to 9.
+// [M.Q.]   [009]   There's always exactly one trophy in the snakepit at any given moment.
+// [N.T.]   [010]   When the snake eats the trophy, its length is increased by the corresponding number of characters.
+// [M.Q.]   [011]   A trophy expires after a random interval from 1 to 9 seconds
+// [M.Q.]   [012]   A new trophy is shown at a random location on the screen after the previous one has either expired or is eated by the snake.
+// [M.Q.]   [S001]  How did you manage displaying and changing the location of trophy?
+// [M.Q.]   [S002]  What about the random locations on the border of your screen?
+// [M.Q.]   [S003]  What if the trophy is too far from the snake regarding the snake’s speed?
+// [A.C.]   [S004]  How do you add points if the snake eats the trophy?
 // ========================================
 
 int getRandomNumber(int min, int max)
@@ -575,7 +579,8 @@ int getRandomNumber(int min, int max)
     return rand() % (max - min + 1) + min;
 } // getRandomNumber
 
-void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLength2, int currentSnake)
+void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1,
+                  int sLength2, int currentSnake)
 {
     static int trophyPosition[2] = {-1, -1};
     static int trophyValue = 0;
@@ -588,18 +593,18 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
         trophyPosition[0] = -1;
         trophyPosition[1] = -1;
         trophyExpirationTime = 0;
-        
+
         if (currentSnake == 2 && isMultiplayer == true)
             score2 += trophyValue;
-        else 
+        else
             score += trophyValue;
     }
     // [009]
     else if (time(NULL) >= trophyExpirationTime)
     {
         // [012]
-        // What if the trophy is too far from the snake regarding the snake’s speed?
-        // What about the random locations on the border of your screen?
+        // [S002]
+        // [S003]
         while (true)
         {
             trophyPosition[0] = getRandomNumber(1, gWidth - 2);
@@ -610,7 +615,7 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
                 if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
                     trophyPosition[0] = -1;
 
-            /*** Check if trophy is located in snake 2 ***/ 
+            /*** Check if trophy is located in snake 2 ***/
             for (int i = 0; i < sLength2 - 1; i++)
                 if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
                     trophyPosition[0] = -1;
@@ -627,17 +632,18 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
         trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
     }
 
-    // How did you manage displaying and changing the location of trophy?
+    // [S001]
     mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
 } // handleTrophy
 
 // The Gameplay
-// [S.C.]   [013] The snake dies and the game ends if:
-//              It runs into the border; or
-//              It runs into itself; or
-//              The user attempts to reverse the snake's direction.
-// [A.C.]   [014] The user wins the game if the snake's length grows to the
-// length equal to half the perimeter of the border.
+// [S.C.]   [013]   The snake dies and the game ends if:
+//                      It runs into the border; or
+//                      It runs into itself; or
+//                      The user attempts to reverse the snake's direction.
+// [A.C.]   [014]   The user wins the game if the snake's length grows to the length equal to half the perimeter of the border.
+// [A.C.]   [S005]  Do you display total points for the player?
+// [M.Q]    [S006]  Does your program handle interrupt signal to end the game?
 // ========================================
 
 // [013]
@@ -647,11 +653,17 @@ void gameOver()
     refresh();
     char arr[18] = {"Game Over You Lose"};
 
+    // [S005]
+    int totalPointsLength = 13;
+    mvprintw(gWidth / 2 + 2, gHeight / 2 - totalPointsLength / 2,
+             "Total Points: %d", score + score2);
+
     for (int i = 0; i <= 17; i++)
     {
         mvaddch(gWidth / 2, ((gHeight / 2) - 17) + i, arr[i]);
         refresh();
     }
+
     sleep(5);
     alive = false;
 } // gameOver
@@ -668,6 +680,17 @@ void victory()
         mvaddch(gWidth / 2, ((gHeight / 2) - 7) + i, arr[i]);
         refresh();
     }
-    sleep(5);
+
+    // [S005]
+    int totalPointsLength = 13;
+    mvprintw(gWidth / 2 + 2, gHeight / 2 - totalPointsLength / 2,
+             "Total Points: %d", score + score2);
+
+    for (int i = 0; i < 5; ++i)
+    {
+        refresh();
+        sleep(5);
+    }
+
     alive = false;
 } // victory
