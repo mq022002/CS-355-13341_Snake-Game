@@ -640,7 +640,7 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
 //                      It runs into itself; or
 //                      The user attempts to reverse the snake's direction.
 // [A.C.]   [014]   The user wins the game if the snake's length grows to the length equal to half the perimeter of the border.
-// [M.Q.]   [S005]  Do you display total points for the player?
+// [A.C.]   [S005]  Do you display total points for the player?
 // [?.?.]    [S006]  Does your program handle interrupt signal to end the game?
 // ========================================
 
