@@ -20,7 +20,7 @@ int gWidth;
 // Set height for the game
 int gHeight;
 // Multiplayer boolean
-bool isMultiplayer = true;
+bool isMultiplayer = false;
 // Score variable
 int score = 0;
 // Score for second snake
