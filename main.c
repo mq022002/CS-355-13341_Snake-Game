@@ -601,13 +601,13 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1, int sLen
     else if (time(NULL) >= trophyExpirationTime)
     {
         // [012]
-        // What if the trophy is too far from the snake regarding the snake’s speed?
-        // What about the random locations on the border of your screen?
+        // [S002]
         while (true)
         {
             trophyPosition[0] = getRandomNumber(1, gWidth - 2);
             trophyPosition[1] = getRandomNumber(1, gHeight - 2);
 
+            // [S003]
             /*** Check if trophy is located in snake 1 ***/
             for (int i = 0; i < sLength1 - 1; i++)
                 if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
