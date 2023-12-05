@@ -26,9 +26,6 @@ bool isMultiplayer = false;
 int score = 0;
 // Score for second snake
 int score2 = 0;
-// Snake speed variables
-int baseSleepTime = 300000;
-int lengthMultiplier = 2000;
 
 // Function Prototypes
 // ========================================
@@ -559,8 +556,10 @@ void changeDirection(int input, int *xDir, int *yDir, bool WASD)
 // [007]
 int makeSnakeZoomZoom(int snakeLength)
 {
+    int baseSleepTime = 300000;
+    int lengthMultiplier = 2000;
     return baseSleepTime - snakeLength * lengthMultiplier;
-}
+} // makeSnakeZoomZoom
 
 // The Trophies
 // [M.Q.]   [008]   Trophies are represented by a digit randomly chosen from 1 to 9.
@@ -603,37 +602,45 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1,
     else if (time(NULL) >= trophyExpirationTime)
     {
         // [012]
-        // [S002]
-        // [S003]
-        while (true)
+        do
         {
-            trophyPosition[0] = getRandomNumber(1, gWidth - 2);
-            trophyPosition[1] = getRandomNumber(1, gHeight - 2);
+            while (true)
+            {
+                trophyPosition[0] = getRandomNumber(1, gWidth - 2);
+                trophyPosition[1] = getRandomNumber(1, gHeight - 2);
 
-            /*** Check if trophy is located in snake 1 ***/
-            for (int i = 0; i < sLength1 - 1; i++)
-                if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
-                    trophyPosition[0] = -1;
+                // [S002]
+                if (trophyPosition[0] == 1 || trophyPosition[0] == gWidth - 2 ||
+                    trophyPosition[1] == 1 || trophyPosition[1] == gHeight - 2)
+                    continue;
 
-            /*** Check if trophy is located in snake 2 ***/
-            for (int i = 0; i < sLength2 - 1; i++)
-                if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
-                    trophyPosition[0] = -1;
+                // Check if trophy is located in snake 1
+                for (int i = 0; i < sLength1 - 1; i++)
+                    if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
+                        trophyPosition[0] = -1;
 
-            // Restart loop if trophy is inside the snake to reset the trophy position
-            if (trophyPosition[0] == -1)
-                continue;
+                // Check if trophy is located in snake 2
+                for (int i = 0; i < sLength2 - 1; i++)
+                    if (bod[i][0] == trophyPosition[0] && bod[i][1] == trophyPosition[1])
+                        trophyPosition[0] = -1;
 
-            break;
-        }
-        // [008]
-        trophyValue = getRandomNumber(1, 9);
-        // [011]
-        trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
+                // Restart loop if trophy is inside the snake to reset the trophy position
+                if (trophyPosition[0] == -1)
+                    continue;
+
+                break;
+            }
+
+            // [008]
+            trophyValue = getRandomNumber(1, 9);
+            // [011]
+            // [S003]
+            trophyExpirationTime = time(NULL) + getRandomNumber(1, 9);
+        } while (abs(head[0] - trophyPosition[0]) + abs(head[1] - trophyPosition[1]) > *sLength);
+
+        // [S001]
+        mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
     }
-
-    // [S001]
-    mvprintw(trophyPosition[0], trophyPosition[1], "%d", trophyValue);
 } // handleTrophy
 
 // The Gameplay
@@ -642,7 +649,7 @@ void handleTrophy(int *head, int (*bod)[2], int *sLength, int sLength1,
 //                      It runs into itself; or
 //                      The user attempts to reverse the snake's direction.
 // [A.C.]   [014]   The user wins the game if the snake's length grows to the length equal to half the perimeter of the border.
-// [A.C.]   [S005]  Do you display total points for the player?
+// [M.Q.]   [S005]  Do you display total points for the player?
 // [M.Q]    [S006]  Does your program handle interrupt signal to end the game?
 // ========================================
 
