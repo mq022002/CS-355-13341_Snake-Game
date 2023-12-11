@@ -9,6 +9,7 @@ To run this project:
 5) Enjoy
 
 Appropriately authored requirements for this project, according to what our professor posted:
+
 ```The snake pit:```
 - [N.T.] [001] The snake pit is the area where the snake can move.
 - [N.T.] [002] The snake pit must utilize all available space of the current terminal window.
