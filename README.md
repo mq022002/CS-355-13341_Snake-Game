@@ -1,3 +1,5 @@
+# THIS REPOSITORY HAS BEEN ARCHIVED AFTER SUCCESSFUL COMPLETION OF THS PROJECT
+
 # Snake Game in C
 Final Project for CS-355-13341, Systems Programming, at Central Connecticut State University. Team: Adrian Cruz, Steven Consolini, Nicholas Tranquilli, and Matthew Quijano.
 
